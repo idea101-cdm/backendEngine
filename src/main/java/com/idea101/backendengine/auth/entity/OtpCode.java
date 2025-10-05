@@ -1,6 +1,6 @@
 package com.idea101.backendengine.auth.entity;
 
-import com.idea101.backendengine.common.enums.UserRole;
+import com.idea101.backendengine.common.enums.OtpReason;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,28 +15,35 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users")
-public class User {
+@Table(name = "otp_code")
+public class OtpCode {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
 
-    @Column(unique = true)
+    @Column(length = 15)
     private String phoneNumber;
 
-    @Column(unique = true)
+    @Column(length = 255)
     private String email;
 
-    @Column
-    private Boolean isActive;
+    @Column(nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private OtpReason purpose;
 
-    @Column
-    private Boolean isVerified;
+    @Column(nullable = false)
+    private Boolean isUsed = false;
+
+    @Column(nullable = false, length = 4)
+    private String otpCode;
+
+    @Column(nullable = false)
+    private LocalDateTime expiresAt;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -48,8 +55,7 @@ public class User {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-
-        if (this.isActive == null) this.isActive = (this.role == UserRole.CUSTOMER);
+        this.expiresAt = LocalDateTime.now().plusMinutes(60);
     }
 
     @PreUpdate
