@@ -1,4 +1,4 @@
-package com.idea101.backendengine.auth.event.model;
+package com.idea101.backendengine.common.event.model.otp;
 
 import lombok.Builder;
 import lombok.Data;

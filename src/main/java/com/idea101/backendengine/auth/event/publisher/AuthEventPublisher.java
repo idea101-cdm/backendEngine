@@ -1,7 +1,7 @@
 package com.idea101.backendengine.auth.event.publisher;
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import com.idea101.backendengine.auth.event.model.OtpEvent;
+import com.idea101.backendengine.common.event.model.otp.OtpEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
