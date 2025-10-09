@@ -45,19 +45,19 @@ public class UserEventSubscriber {
 
         try {
             switch (event.getEventType()) {
-                case "USER_CREDENTIALS_UPDATED" -> {
+                case "UPDATE_USER_CREDENTIALS" -> {
                     UserCredentialsUpdatedEvent user = (UserCredentialsUpdatedEvent) event;
                     userService.updateCredentials(user.getUser().getId(), user.getEmail(), user.getPhoneNumber());
                 }
-                case "USER_ACTIVATED" -> {
+                case "ACTIVATE_USER" -> {
                     UserActivatedEvent user = (UserActivatedEvent) event;
                     userService.activateUser(user.getUser().getId());
                 }
-                case "USER_DEACTIVATED" -> {
+                case "DEACTIVATE_USER" -> {
                     UserDeactivatedEvent user = (UserDeactivatedEvent) event;
                     userService.deactivateUser(user.getUser().getId());
                 }
-                case "USER_DELETED" -> {
+                case "DELETE_USER" -> {
                     UserDeletedEvent user = (UserDeletedEvent) event;
                     userService.deleteUser(user.getUser().getId());
                 }

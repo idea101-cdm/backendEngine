@@ -16,6 +16,6 @@ public class UserActivatedEvent extends UserEvent {
 
     @Override
     public String getEventType() {
-        return "USER_ACTIVATED";
+        return "ACTIVATE_USER";
     }
 }

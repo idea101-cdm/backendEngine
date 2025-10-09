@@ -16,6 +16,6 @@ public class UserDeletedEvent extends UserEvent {
 
     @Override
     public String getEventType() {
-        return "USER_DELETED";
+        return "DELETE_USER";
     }
 }

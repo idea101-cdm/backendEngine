@@ -16,10 +16,10 @@ import java.time.Instant;
         property = "eventType"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = UserCredentialsUpdatedEvent.class, name = "USER_CREDENTIALS_UPDATED"),
-        @JsonSubTypes.Type(value = UserActivatedEvent.class, name = "USER_ACTIVATED"),
-        @JsonSubTypes.Type(value = UserDeactivatedEvent.class, name = "USER_DEACTIVATED"),
-        @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "USER_DELETED")
+        @JsonSubTypes.Type(value = UserCredentialsUpdatedEvent.class, name = "UPDATE_USER_CREDENTIALS"),
+        @JsonSubTypes.Type(value = UserActivatedEvent.class, name = "ACTIVATE_USER"),
+        @JsonSubTypes.Type(value = UserDeactivatedEvent.class, name = "DEACTIVATE_USER"),
+        @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "DELETE_USER")
 })
 public abstract class UserEvent {
 

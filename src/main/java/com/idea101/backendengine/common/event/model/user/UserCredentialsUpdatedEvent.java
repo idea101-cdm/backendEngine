@@ -21,7 +21,7 @@ public class UserCredentialsUpdatedEvent extends UserEvent {
 
     @Override
     public String getEventType() {
-        return "USER_UPDATED";
+        return "UPDATE_USER_CREDENTIALS";
     }
 
 }

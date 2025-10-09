@@ -16,6 +16,6 @@ public class UserDeactivatedEvent extends UserEvent {
 
     @Override
     public String getEventType() {
-        return "USER_DEACTIVATED";
+        return "DEACTIVATE_USER";
     }
 }

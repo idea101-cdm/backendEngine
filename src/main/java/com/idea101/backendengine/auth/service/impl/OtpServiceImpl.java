@@ -104,7 +104,7 @@ public class OtpServiceImpl implements OtpService {
             }
 
             assert otpCode.getUser() != null;
-            return jwtUtil.generateToken(user.getId(), String.valueOf(user.getRole()));
+            return jwtUtil.generateToken(user.getId(), user.getRole(), user.getIsVerified(), user.getIsActive());
 
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw e;
