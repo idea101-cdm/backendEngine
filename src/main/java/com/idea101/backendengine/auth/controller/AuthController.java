@@ -5,55 +5,59 @@ import com.idea101.backendengine.auth.dto.GenerateOtpResponseDto;
 import com.idea101.backendengine.auth.dto.VerifyOtpRequestDto;
 import com.idea101.backendengine.auth.dto.VerifyOtpResponseDto;
 import com.idea101.backendengine.auth.service.OtpService;
+import com.idea101.backendengine.auth.service.UserService;
+import com.idea101.backendengine.common.error.ProblemDetailService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Log4j2
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     private final OtpService otpService;
-
-    public AuthController(OtpService otpService) {
-        this.otpService = otpService;
-    }
+    private final UserService userService;
+    private final ProblemDetailService error;
 
     @PostMapping("/generate-otp")
-    public ResponseEntity<?> generateOtp(@Valid @RequestBody GenerateOtpRequestDto requestDto) {
+    public ResponseEntity<GenerateOtpResponseDto> generateOtp(@Valid @RequestBody GenerateOtpRequestDto requestDto) {
         try {
-            UUID id = otpService.requestOtp(requestDto);
+            UUID otpId = otpService.requestOtp(requestDto);
+            log.info("OTP generated successfully for {} via {}. OTP ID: {}",
+                    requestDto.getPhoneNumber() != null ? requestDto.getPhoneNumber() : requestDto.getEmailId(),
+                    requestDto.getPhoneNumber() != null ? "SMS" : "EMAIL",
+                    otpId);
 
-            GenerateOtpResponseDto response = new GenerateOtpResponseDto(id, "OTP sent successfully");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(new GenerateOtpResponseDto(otpId, "OTP sent successfully"));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error generating OTP: " + e.getMessage());
+            log.error("Failed to generate OTP for request: {}", requestDto, e);
+            return ResponseEntity.of( error.create( HttpStatus.INTERNAL_SERVER_ERROR, "OTP Generation Failed", "Error generating OTP: " + e.getMessage())).build();
         }
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequestDto requestDto) {
+    public ResponseEntity<VerifyOtpResponseDto> verifyOtp(@Valid @RequestBody VerifyOtpRequestDto requestDto) {
         try {
-            String jwtToken = otpService.verifyOtp(requestDto);
-            VerifyOtpResponseDto response = new VerifyOtpResponseDto(jwtToken);
-            return ResponseEntity.ok().body(response);
-
+            String jwtToken = userService.loginUserWithOtp(requestDto);
+            log.info("OTP verified successfully for OTP ID: {}. JWT issued.", requestDto.getId());
+            return ResponseEntity.ok(new VerifyOtpResponseDto(jwtToken));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
+            log.warn("Invalid OTP for ID {}: {}", requestDto.getId(), e.getMessage());
+            return ResponseEntity.of(error.create( HttpStatus.BAD_REQUEST, "Invalid OTP", e.getMessage())).build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.GONE).body(e.getMessage());
-
+            log.warn("Expired or used OTP for ID {}: {}", requestDto.getId(), e.getMessage());
+            return ResponseEntity.of(error.create( HttpStatus.GONE, "OTP Expired or Used", e.getMessage())).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error verifying OTP: " + e.getMessage());
+            log.error("Unexpected error during OTP verification for ID {}: {}", requestDto.getId(), e.getMessage(), e);
+            return ResponseEntity.of(error.create(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Error verifying OTP: " + e.getMessage()
+            )).build();
         }
     }
 }

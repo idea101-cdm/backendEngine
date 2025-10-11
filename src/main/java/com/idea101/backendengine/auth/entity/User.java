@@ -28,23 +28,23 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(unique = true)
+    @Column
     private String phoneNumber;
 
-    @Column(unique = true)
+    @Column
     private String email;
 
     @Column
     private Boolean isActive;
 
     @Column
-    private Boolean isVerified;
+    private Boolean isGhostAccount;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OtpCode> otpCodes = new ArrayList<>();
@@ -53,6 +53,7 @@ public class User {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.isGhostAccount = true;
 
         if (this.isActive == null) this.isActive = (this.role == UserRole.CUSTOMER);
     }

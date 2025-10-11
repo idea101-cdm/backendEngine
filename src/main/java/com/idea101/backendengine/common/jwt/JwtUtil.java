@@ -26,13 +26,12 @@ public class JwtUtil {
         this.expirationMinutes = expirationMinutes;
     }
 
-    public String generateToken(UUID userId, UserRole role, Boolean isVerified, Boolean isActive) {
+    public String generateToken(UUID userId, UserRole role, Boolean isActive) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(userId.toString())
                 .id(UUID.randomUUID().toString())
                 .claim("role", role)
-                .claim("isVerified", isVerified)
                 .claim("isActive", isActive)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(expirationMinutes, ChronoUnit.MINUTES)))
@@ -70,15 +69,6 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("role");
-    }
-
-    public Boolean extractIsVerified(String token) {
-        return (Boolean) Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("isVerified");
     }
 
     public Boolean extractIsActive(String token) {

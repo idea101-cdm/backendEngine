@@ -23,13 +23,13 @@ public class OtpCode {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Column(length = 15)
     private String phoneNumber;
 
-    @Column(length = 255)
+    @Column
     private String email;
 
     @Column(nullable = false, length = 50)
@@ -46,10 +46,10 @@ public class OtpCode {
     private LocalDateTime expiresAt;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {

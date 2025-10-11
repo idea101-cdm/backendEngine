@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Data
 public class VerifyOtpRequestDto {
-    @NotNull(message = "Id is mandatory")
+    @NotNull(message = "Otp Id is mandatory")
     private UUID id;
     @NotNull(message = "Otp is mandatory")
     private String otpCode;
