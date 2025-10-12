@@ -1,10 +1,10 @@
 package com.idea101.backendengine.auth.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
-public class VerifyOtpResponseDto {
+public class TokenResponse {
     private String token;
 }

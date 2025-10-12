@@ -1,13 +1,12 @@
 package com.idea101.backendengine.auth.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
 @AllArgsConstructor
-@Data
-public class GenerateOtpResponseDto {
-    private UUID id;
-    private String message;
+public class OtpResponse {
+    public UUID id;
 }

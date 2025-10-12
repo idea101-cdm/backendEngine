@@ -1,13 +1,14 @@
 package com.idea101.backendengine.common.interceptor;
 
-import com.idea101.backendengine.common.annotation.JwtProtected;
+import com.idea101.backendengine.common.annotation.authentication.JwtProtected;
+import com.idea101.backendengine.common.context.jwtUserContext;
 import com.idea101.backendengine.common.enums.UserRole;
 import com.idea101.backendengine.common.jwt.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.messaging.handler.HandlerMethod;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Arrays;
@@ -65,8 +66,8 @@ public class JwtAnnotationInterceptor implements HandlerInterceptor {
         }
 
         UUID id = jwtUtil.extractUserId(token);
-        request.setAttribute("userRole", userRole);
-        request.setAttribute("userId", id);
+        jwtUserContext context = new jwtUserContext(id, userRole);
+        request.setAttribute("userContext", context);
 
         log.info("JWT validated successfully for user '{}' with role '{}' on endpoint '{}'", id, userRole, request.getRequestURI());
 

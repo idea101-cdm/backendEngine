@@ -1,4 +1,4 @@
-package com.idea101.backendengine.common.annotation;
+package com.idea101.backendengine.common.annotation.authentication;
 
 import com.idea101.backendengine.common.enums.UserRole;
 

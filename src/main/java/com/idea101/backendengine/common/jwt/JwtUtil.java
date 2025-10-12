@@ -63,12 +63,14 @@ public class JwtUtil {
     }
 
     public UserRole extractRole(String token) {
-        return (UserRole) Jwts.parser()
+        String roleStr = (String) Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("role");
+
+        return UserRole.valueOf(roleStr);
     }
 
     public Boolean extractIsActive(String token) {

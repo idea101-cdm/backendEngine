@@ -16,7 +16,7 @@ import java.time.Instant;
         property = "eventType"
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = UserCredentialsUpdatedEvent.class, name = "UPDATE_USER_CREDENTIALS"),
+        @JsonSubTypes.Type(value = UserEmailOrPhoneUpdatedEvent.class, name = "UPDATE_USER_EMAIL_OR_PHONE_NUMBER"),
         @JsonSubTypes.Type(value = UserActivatedEvent.class, name = "ACTIVATE_USER"),
         @JsonSubTypes.Type(value = UserDeactivatedEvent.class, name = "DEACTIVATE_USER"),
         @JsonSubTypes.Type(value = UserDeletedEvent.class, name = "DELETE_USER")

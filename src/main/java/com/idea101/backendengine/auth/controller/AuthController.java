@@ -1,16 +1,13 @@
 package com.idea101.backendengine.auth.controller;
 
-import com.idea101.backendengine.auth.dto.GenerateOtpRequestDto;
-import com.idea101.backendengine.auth.dto.GenerateOtpResponseDto;
-import com.idea101.backendengine.auth.dto.VerifyOtpRequestDto;
-import com.idea101.backendengine.auth.dto.VerifyOtpResponseDto;
-import com.idea101.backendengine.auth.service.OtpService;
-import com.idea101.backendengine.auth.service.UserService;
-import com.idea101.backendengine.common.error.ProblemDetailService;
+import com.idea101.backendengine.auth.dto.*;
+import com.idea101.backendengine.auth.service.AuthService;
+import com.idea101.backendengine.common.annotation.authentication.jwtUser;
+import com.idea101.backendengine.common.annotation.authentication.JwtProtected;
+import com.idea101.backendengine.common.context.jwtUserContext;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,45 +16,45 @@ import java.util.UUID;
 @Log4j2
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final OtpService otpService;
-    private final UserService userService;
-    private final ProblemDetailService error;
+    private final AuthService authService;
 
-    @PostMapping("/generate-otp")
-    public ResponseEntity<GenerateOtpResponseDto> generateOtp(@Valid @RequestBody GenerateOtpRequestDto requestDto) {
-        try {
-            UUID otpId = otpService.requestOtp(requestDto);
-            log.info("OTP generated successfully for {} via {}. OTP ID: {}",
-                    requestDto.getPhoneNumber() != null ? requestDto.getPhoneNumber() : requestDto.getEmailId(),
-                    requestDto.getPhoneNumber() != null ? "SMS" : "EMAIL",
-                    otpId);
-
-            return ResponseEntity.ok(new GenerateOtpResponseDto(otpId, "OTP sent successfully"));
-        } catch (Exception e) {
-            log.error("Failed to generate OTP for request: {}", requestDto, e);
-            return ResponseEntity.of( error.create( HttpStatus.INTERNAL_SERVER_ERROR, "OTP Generation Failed", "Error generating OTP: " + e.getMessage())).build();
-        }
+    @PostMapping("/login")
+    public ResponseEntity<OtpResponse> initiateLogin(@RequestBody @Valid OtpLoginRequest request) {
+        UUID otpId = authService.initiateLoginViaOtp(request.getIdentifier(), request.getRole());
+        return ResponseEntity.accepted().body(new OtpResponse(otpId));
     }
 
-    @PostMapping("/verify-otp")
-    public ResponseEntity<VerifyOtpResponseDto> verifyOtp(@Valid @RequestBody VerifyOtpRequestDto requestDto) {
-        try {
-            String jwtToken = userService.loginUserWithOtp(requestDto);
-            log.info("OTP verified successfully for OTP ID: {}. JWT issued.", requestDto.getId());
-            return ResponseEntity.ok(new VerifyOtpResponseDto(jwtToken));
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid OTP for ID {}: {}", requestDto.getId(), e.getMessage());
-            return ResponseEntity.of(error.create( HttpStatus.BAD_REQUEST, "Invalid OTP", e.getMessage())).build();
-        } catch (IllegalStateException e) {
-            log.warn("Expired or used OTP for ID {}: {}", requestDto.getId(), e.getMessage());
-            return ResponseEntity.of(error.create( HttpStatus.GONE, "OTP Expired or Used", e.getMessage())).build();
-        } catch (Exception e) {
-            log.error("Unexpected error during OTP verification for ID {}: {}", requestDto.getId(), e.getMessage(), e);
-            return ResponseEntity.of(error.create(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Error verifying OTP: " + e.getMessage()
-            )).build();
-        }
+    @PostMapping("/verify-login")
+    public ResponseEntity<TokenResponse> verifyLogin(@RequestBody @Valid OtpVerificationRequest request) {
+        String token = authService.verifyLoginOtp(request.getOtpId(), request.getOtpCode());
+        return ResponseEntity.ok(new TokenResponse(token));
+    }
+
+    @JwtProtected
+    @PostMapping("/update-phone/initiate")
+    public ResponseEntity<OtpResponse> initiatePhoneUpdate(@RequestBody @Valid UpdatePhoneRequest request, @jwtUser jwtUserContext user) {
+        UUID otpId = authService.initiatePhoneUpdate(user.id(), request.getNewPhoneNumber());
+        return ResponseEntity.accepted().body(new OtpResponse(otpId));
+    }
+
+    @PostMapping("/update-phone/verify")
+    public ResponseEntity<Void> verifyPhoneUpdate(@RequestBody @Valid VerifyPhoneOtpRequest request) {
+        authService.verifyPhoneUpdateOtp(request.getOtpId(), request.getOtpCode(), request.getNewPhoneNumber());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/update-email/initiate")
+    public ResponseEntity<OtpResponse> initiateEmailUpdate(@RequestBody @Valid UpdateEmailRequest request, @jwtUser jwtUserContext user) {
+        UUID otpId = authService.initiateEmailUpdate(user.id(), request.getNewEmail());
+        return ResponseEntity.accepted().body(new OtpResponse(otpId));
+    }
+
+    @PostMapping("/update-email/verify")
+    public ResponseEntity<Void> verifyEmailUpdate(@RequestBody @Valid VerifyEmailOtpRequest request) {
+        authService.verifyEmailUpdateOtp(request.getOtpId(), request.getOtpCode(), request.getNewEmail());
+        return ResponseEntity.ok().build();
     }
 }

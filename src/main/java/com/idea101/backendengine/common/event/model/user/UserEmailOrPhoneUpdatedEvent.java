@@ -7,21 +7,21 @@ import lombok.ToString;
 
 @Getter
 @ToString(callSuper=true)
-public class UserCredentialsUpdatedEvent extends UserEvent {
+public class UserEmailOrPhoneUpdatedEvent extends UserEvent {
 
     private final String phoneNumber;
-    private final String email;
+    private final String identifier;
 
     @Builder
-    public UserCredentialsUpdatedEvent(User user, String performedBy, String phoneNumber, String email) {
+    public UserEmailOrPhoneUpdatedEvent(User user, String performedBy, String phoneNumber, String identifier) {
         super(user, performedBy);
         this.phoneNumber = phoneNumber;
-        this.email = email;
+        this.identifier = identifier;
     }
 
     @Override
     public String getEventType() {
-        return "UPDATE_USER_CREDENTIALS";
+        return "UPDATE_USER_EMAIL_OR_PHONE_NUMBER";
     }
 
 }
