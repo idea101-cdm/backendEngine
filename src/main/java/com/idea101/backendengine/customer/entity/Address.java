@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -40,24 +42,18 @@ public class Address {
 
     private Boolean isDefault;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void prePersist() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
 
     @PreUpdate
     protected void preUpdate() {
         if (addressTag == CustomerAddressTag.Other && (customAddressTag == null || customAddressTag.isBlank())) {
             customAddressTag = CustomerAddressTag.Other.toString();
         }
-
-        updatedAt = LocalDateTime.now();
     }
 }

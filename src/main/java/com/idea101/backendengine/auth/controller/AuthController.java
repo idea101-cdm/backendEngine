@@ -5,6 +5,7 @@ import com.idea101.backendengine.auth.service.AuthService;
 import com.idea101.backendengine.common.annotation.authentication.jwtUser;
 import com.idea101.backendengine.common.annotation.authentication.JwtProtected;
 import com.idea101.backendengine.common.context.jwtUserContext;
+import com.idea101.backendengine.restaurant.entity.RestaurantUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
