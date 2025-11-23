@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secret Keys ###
+src/main/resources/thermal-pattern-452408-d2-a5e3c5aa1703.json
